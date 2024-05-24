@@ -17,6 +17,7 @@ class TestTextNode(unittest.TestCase):
     def test_eq2(self):
         node = TextNode("This is a text node", "cursive", "https://boot.dev")
         node2 = TextNode("This is a text node", "bold", "https://boot.dev")
+        self.assertNotEqual(node, node2)
 
 
 if __name__ == "__main__":
