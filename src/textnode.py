@@ -67,6 +67,62 @@ def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: str, text_type: 
     
     return new_nodes
 
+def split_nodes_image(old_nodes):
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT.value:
+            new_nodes.append(node)
+            continue
+
+        text = node.text
+        images = extract_markdown_images(text)
+        if not images:
+            new_nodes.append(node)
+            continue
+
+        last_end = 0
+        for alt_text, url in images:
+            start = text.find(f"![{alt_text}]({url})", last_end)
+            if start != -1:
+                if start > last_end:
+                    new_nodes.append(TextNode(text[last_end:start], TextType.TEXT))
+                new_nodes.append(TextNode(alt_text, TextType.IMAGE, url))
+                last_end = start + len(f"![{alt_text}]({url})")
+
+        if last_end < len(text):
+            new_nodes.append(TextNode(text[last_end:], TextType.TEXT))
+
+    return new_nodes
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT.value:
+            new_nodes.append(node)
+            continue
+
+        text = node.text
+        links = extract_markdown_links(text)
+        if not links:
+            new_nodes.append(node)
+            continue
+
+        last_end = 0
+        for link_text, url in links:
+            start = text.find(f"[{link_text}]({url})", last_end)
+            if start != -1:
+                if start > last_end:
+                    new_nodes.append(TextNode(text[last_end:start], TextType.TEXT))
+                new_nodes.append(TextNode(link_text, TextType.LINK, url))
+                last_end = start + len(f"[{link_text}]({url})")
+
+        if last_end < len(text):
+            new_nodes.append(TextNode(text[last_end:], TextType.TEXT))
+
+    return new_nodes
+
 def extract_markdown_images(text: str) -> list:
     matches = re.findall(r"!\[(.*?)\]\((.*?)\)", text)
     return matches
