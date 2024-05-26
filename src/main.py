@@ -1,11 +1,11 @@
-from textnode import TextNode, TextType, split_nodes_delimiter
+from textnode import TextNode, TextType, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 from htmlnode import LeafNode
 
 def main():
-    node = TextNode("This is text with a `code block` word", TextType.TEXT)
-    new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+    text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+    print(extract_markdown_images(text))
 
-    for n in new_nodes:
-        print(n)
+    text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
+    print(extract_markdown_links(text))
 
 main()

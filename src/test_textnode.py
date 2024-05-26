@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter
+from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, extract_markdown_links, extract_markdown_images
 from htmlnode import LeafNode
 
 class TestTextNode(unittest.TestCase):
@@ -133,7 +133,117 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         ]
 
         self.assertEqual(new_nodes, should_be)
+    
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_2_images(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        result = extract_markdown_images(text)
+        should_be = [("image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"), ("another", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")]
 
+        self.assertEqual(result, should_be)
+
+    def test_single_image(self):
+        text = "Here is a single ![example](https://example.com/image.png) in the text."
+        result = extract_markdown_images(text)
+        should_be = [("example", "https://example.com/image.png")]
+
+        self.assertEqual(result, should_be)
+
+    def test_no_images(self):
+        text = "This text contains no images."
+        result = extract_markdown_images(text)
+        should_be = []
+
+        self.assertEqual(result, should_be)
+
+    def test_images_with_special_characters(self):
+        text = "An image with special characters ![special@image](https://example.com/image@name.png) and another ![image&with*chars](https://example.com/image&name*.png)."
+        result = extract_markdown_images(text)
+        should_be = [
+            ("special@image", "https://example.com/image@name.png"),
+            ("image&with*chars", "https://example.com/image&name*.png")
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_image_with_spaces(self):
+        text = "An image with spaces in the alt text ![image with spaces](https://example.com/image.png)."
+        result = extract_markdown_images(text)
+        should_be = [("image with spaces", "https://example.com/image.png")]
+
+        self.assertEqual(result, should_be)
+
+    def test_multiple_lines(self):
+        text = """
+        This is text with multiple images:
+        ![first image](https://example.com/first.png)
+        Some text in between.
+        ![second image](https://example.com/second.png)
+        """
+        result = extract_markdown_images(text)
+        should_be = [
+            ("first image", "https://example.com/first.png"),
+            ("second image", "https://example.com/second.png")
+        ]
+
+        self.assertEqual(result, should_be)
+
+class TestExtractMarkdownLinks(unittest.TestCase):
+    def test_single_link(self):
+        text = "Here is a single [example](https://example.com) in the text."
+        result = extract_markdown_links(text)
+        should_be = [("example", "https://example.com")]
+
+        self.assertEqual(result, should_be)
+
+    def test_multiple_links(self):
+        text = "This text contains [first link](https://example.com/first) and [second link](https://example.com/second)."
+        result = extract_markdown_links(text)
+        should_be = [
+            ("first link", "https://example.com/first"),
+            ("second link", "https://example.com/second")
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_no_links(self):
+        text = "This text contains no links."
+        result = extract_markdown_links(text)
+        should_be = []
+
+        self.assertEqual(result, should_be)
+
+    def test_links_with_special_characters(self):
+        text = "A link with special characters [special@link](https://example.com/link@name) and another [link&with*chars](https://example.com/link&name*)."
+        result = extract_markdown_links(text)
+        should_be = [
+            ("special@link", "https://example.com/link@name"),
+            ("link&with*chars", "https://example.com/link&name*")
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_link_with_spaces(self):
+        text = "A link with spaces in the text [link with spaces](https://example.com)."
+        result = extract_markdown_links(text)
+        should_be = [("link with spaces", "https://example.com")]
+
+        self.assertEqual(result, should_be)
+
+    def test_multiple_lines(self):
+        text = """
+        This is text with multiple links:
+        [first link](https://example.com/first)
+        Some text in between.
+        [second link](https://example.com/second)
+        """
+        result = extract_markdown_links(text)
+        should_be = [
+            ("first link", "https://example.com/first"),
+            ("second link", "https://example.com/second")
+        ]
+
+        self.assertEqual(result, should_be)
 
 
 if __name__ == "__main__":

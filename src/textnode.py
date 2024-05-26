@@ -1,3 +1,5 @@
+import re
+
 from typing import List, Union, Optional
 
 from enum import Enum
@@ -45,7 +47,7 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     else:
         raise ValueError(f'{text_node.text_type} is not supported')
     
-def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: str, text_type: TextType):
+def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: str, text_type: TextType) -> List[TextNode]:
     new_nodes = []
     for node in old_nodes:
         if node.text_type != TextType.TEXT.value:
@@ -64,5 +66,14 @@ def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: str, text_type: 
                 new_nodes.append(TextNode(part, text_type))
     
     return new_nodes
+
+def extract_markdown_images(text: str) -> list:
+    matches = re.findall(r"!\[(.*?)\]\((.*?)\)", text)
+    return matches
+
+def extract_markdown_links(text: str) -> list:
+    matches = re.findall(r"\[(.*?)\]\((.*?)\)", text)
+    return matches
+
 
     
