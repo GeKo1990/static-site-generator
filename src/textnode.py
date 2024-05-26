@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Union, Optional
 
 from enum import Enum
 from htmlnode import LeafNode
@@ -12,9 +12,12 @@ class TextType(Enum):
     IMAGE = "image"
 
 class TextNode:
-    def __init__(self, text: str, text_type: str, url: Optional[str] = None):
+    def __init__(self, text: str, text_type: Union[str, TextType], url: Optional[str] = None):
         self.text = text
-        self.text_type = text_type
+        if isinstance(text_type, TextType):
+            self.text_type = text_type.value
+        else:
+            self.text_type = text_type
         self.url = url
 
     def __eq__(self, value: object) -> bool:
@@ -41,4 +44,25 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
         return LeafNode("img","", { "src" : text_node.url, "alt" : text_node.text })
     else:
         raise ValueError(f'{text_node.text_type} is not supported')
+    
+def split_nodes_delimiter(old_nodes: List[TextNode], delimiter: str, text_type: TextType):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT.value:
+            new_nodes.append(node)
+            continue
+        
+        parts = node.text.split(delimiter)
+        if len(parts) % 2 == 0:
+            raise ValueError(f"Unmatched delimiter '{delimiter}' in text: {node.text}")
+        
+        for i, part in enumerate(parts):
+            if i % 2 == 0:
+                if part:
+                    new_nodes.append(TextNode(part, 'text'))
+            else:
+                new_nodes.append(TextNode(part, text_type))
+    
+    return new_nodes
+
     
