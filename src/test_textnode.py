@@ -4,7 +4,8 @@ from htmlnode import LeafNode
 from textnode import (
     TextNode, 
     TextType, 
-    text_node_to_html_node, 
+    text_node_to_html_node,
+    text_to_textnodes,
     split_nodes_delimiter, 
     extract_markdown_links, 
     extract_markdown_images, 
@@ -310,6 +311,107 @@ class TestExtractMarkdownLinks(unittest.TestCase):
 
         self.assertEqual(result, should_be)
 
+class TestTextToTextNodes(unittest.TestCase):
+    def test_mixed_formatting(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+        result = text_to_textnodes(text)
+
+        should_be = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("image", TextType.IMAGE, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_no_formatting(self):
+        text = "This is plain text with no formatting."
+        result = text_to_textnodes(text)
+
+        should_be = [
+            TextNode("This is plain text with no formatting.", TextType.TEXT)
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_only_bold(self):
+        text = "This is **bold** text."
+        result = text_to_textnodes(text)
+
+        should_be = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" text.", TextType.TEXT)
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_only_italic(self):
+        text = "This is *italic* text."
+        result = text_to_textnodes(text)
+
+        should_be = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" text.", TextType.TEXT)
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_only_code(self):
+        text = "This is `code` text."
+        result = text_to_textnodes(text)
+
+        should_be = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("code", TextType.CODE),
+            TextNode(" text.", TextType.TEXT)
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_only_image(self):
+        text = "This is an ![image](https://example.com/image.png)"
+        result = text_to_textnodes(text)
+
+        should_be = [
+            TextNode("This is an ", TextType.TEXT),
+            TextNode("image", TextType.IMAGE, "https://example.com/image.png")
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_only_link(self):
+        text = "This is a [link](https://example.com)"
+        result = text_to_textnodes(text)
+
+        should_be = [
+            TextNode("This is a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://example.com")
+        ]
+
+        self.assertEqual(result, should_be)
+
+    def test_combined_bold_italic(self):
+        text = "This is **bold** and *italic* text."
+        result = text_to_textnodes(text)
+
+        should_be = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" text.", TextType.TEXT)
+        ]
+
+        self.assertEqual(result, should_be)
 
 if __name__ == "__main__":
     unittest.main()
