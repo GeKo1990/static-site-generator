@@ -16,4 +16,20 @@ def main():
         result = text_to_textnodes(text)
         print(result)
 
+def markdown_to_blocks(markdown):
+    # Split the markdown text into blocks using double newlines
+    blocks = markdown.split('\n\n')
+    
+    clean_blocks = []
+    
+    for block in blocks:
+        # Further split blocks by single newlines if they contain list items
+        sub_blocks = block.split('\n')
+        for sub_block in sub_blocks:
+            clean_sub_block = sub_block.strip()
+            if clean_sub_block:
+                clean_blocks.append(clean_sub_block)
+    
+    return clean_blocks
+
 main()
