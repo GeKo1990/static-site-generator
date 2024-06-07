@@ -1,6 +1,6 @@
 import unittest
 
-from main import markdown_to_blocks
+from main import markdown_to_blocks, block_to_block_type
 
 class TestMarkdownToBlocks(unittest.TestCase):
     
@@ -64,6 +64,34 @@ class TestMarkdownToBlocks(unittest.TestCase):
             "End of markdown"
         ]
         self.assertEqual(markdown_to_blocks(raw_markdown), expected_output)
+
+class TestBlockToBlockType(unittest.TestCase):
+    def test_block_type_heading(self):
+        block = "1# This is a heading"
+        self.assertEqual(block_to_block_type(block), "heading")
+
+    def test_block_type_code(self):
+        block = "```code block```"
+        self.assertEqual(block_to_block_type(block), "code")
+    
+    def test_block_type_quote(self):
+        block = "> Quote line 1\n> Quote line 2"
+        self.assertEqual(block_to_block_type(block), "quote")
+
+    def test_block_type_unordered_list(self):
+        block = "* Unordered list item 1\n* Unordered list item 2"
+        self.assertEqual(block_to_block_type(block), "unordered_list")
+
+        block = "- Unordered list item 1\n- Unordered list item 2"
+        self.assertEqual(block_to_block_type(block), "unordered_list")
+
+    def test_block_type_ordered_list(self):
+        block = "1. Ordered list item 1\n2. Ordered list item 2"
+        self.assertEqual(block_to_block_type(block), "ordered_list")
+
+    def test_block_type_paragraph(self):
+        block = "This is a regular paragraph without any special formatting."
+        self.assertEqual(block_to_block_type(block), "paragraph")
 
 if __name__ == '__main__':
     unittest.main()
