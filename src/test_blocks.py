@@ -1,6 +1,16 @@
 import unittest
-
-from blocks import markdown_to_blocks, block_to_block_type
+import re
+from htmlnode import HTMLNode, LeafNode, ParentNode
+from blocks import (
+    markdown_to_blocks,
+    block_to_block_type,
+    paragraph_to_html_node,
+    heading_to_html_node,
+    unordered_list_to_html_node,
+    ordered_list_to_html_node,
+    code_to_html_node,
+    quote_to_html_node
+)
 
 class TestMarkdownToBlocks(unittest.TestCase):
     
@@ -92,6 +102,47 @@ class TestBlockToBlockType(unittest.TestCase):
     def test_block_type_paragraph(self):
         block = "This is a regular paragraph without any special formatting."
         self.assertEqual(block_to_block_type(block), "paragraph")
+
+class TestMarkdownToHTML(unittest.TestCase):
+
+    def test_paragraph_to_html_node(self):
+        block = "This is a paragraph with multiple lines.\nIt should be joined into one line."
+        expected_output = ParentNode("p", [LeafNode(value="This is a paragraph with multiple lines. It should be joined into one line.")])
+        self.assertEqual(paragraph_to_html_node(block), expected_output)
+
+    def test_unordered_list_to_html_node(self):
+        block = "* Item 1\n* Item 2\n- Item 3"
+        expected_output = ParentNode("ul", [
+            ParentNode("li", [LeafNode(value="Item 1")]),
+            ParentNode("li", [LeafNode(value="Item 2")]),
+            ParentNode("li", [LeafNode(value="Item 3")])
+        ])
+        self.assertEqual(unordered_list_to_html_node(block), expected_output)
+
+    def test_ordered_list_to_html_node(self):
+        block = "1. First item\n2. Second item"
+        expected_output = ParentNode("ol", [
+            ParentNode("li", [LeafNode(value="First item")]),
+            ParentNode("li", [LeafNode(value="Second item")])
+        ])
+        self.assertEqual(ordered_list_to_html_node(block), expected_output)
+
+    def test_code_to_html_node(self):
+        block = "```print('Hello, world!')```"
+        expected_output = ParentNode("pre", [
+            ParentNode("code", [LeafNode(value="print('Hello, world!')")])
+        ])
+        self.assertEqual(code_to_html_node(block), expected_output)
+
+    def test_heading_to_html_node(self):
+        block = "### This is a heading"
+        expected_output = ParentNode("h3", [LeafNode(value="This is a heading")])
+        self.assertEqual(heading_to_html_node(block), expected_output)
+
+    def test_quote_to_html_node(self):
+        block = "> Quote line 1\n> Quote line 2"
+        expected_output = ParentNode("blockquote", [LeafNode(value="Quote line 1 Quote line 2")])
+        self.assertEqual(quote_to_html_node(block), expected_output)
 
 if __name__ == '__main__':
     unittest.main()

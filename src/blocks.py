@@ -78,7 +78,7 @@ def ordered_list_to_html_node(block):
     return ParentNode("ol", html_items)
 
 def code_to_html_node(block):
-    match = re.match(r"^```(.*?*)```$", block, re.DOTALL)
+    match = re.match(r"^```(.*?)```$", block, re.DOTALL)
     if not match:
         raise ValueError('invalid code block')
     
