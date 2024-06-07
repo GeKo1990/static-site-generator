@@ -25,6 +25,30 @@ def markdown_to_blocks(markdown):
     
     return clean_blocks
 
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    children = []
+    for block in blocks:
+        html_node = block_to_html_node(block)
+        children.append(html_node)
+    return ParentNode("div", children, None)
+
+def block_to_html_node(block):
+    block_type = block_to_block_type(block)
+    if block_type == block_type_paragraph:
+        return paragraph_to_html_node(block)
+    if block_type == block_type_heading:
+        return heading_to_html_node(block)
+    if block_type == block_type_code:
+        return code_to_html_node(block)
+    if block_type == block_type_ordered_list:
+        return ordered_list_to_html_node(block)
+    if block_type == block_type_unordered_list:
+        return unordered_list_to_html_node(block)
+    if block_type == block_type_quote:
+        return quote_to_html_node(block)
+    raise ValueError("Invalid block type")
+
 def block_to_block_type(block):
     if re.match(r"^[1-6]# ", block):
         return block_type_heading

@@ -9,8 +9,51 @@ from blocks import (
     unordered_list_to_html_node,
     ordered_list_to_html_node,
     code_to_html_node,
-    quote_to_html_node
+    quote_to_html_node,
+    block_to_html_node,
+    markdown_to_html_node
 )
+
+class TestMarkdownToHTMLNode(unittest.TestCase):
+
+    def test_markdown_to_html_node(self):
+        markdown = """
+        # Heading 1
+
+        This is a paragraph with some **bold** and *italic* text.
+
+        * List item 1
+        * List item 2
+
+        1. Ordered item 1
+        2. Ordered item 2
+
+        ```print('Hello, world!')```
+
+        > This is a quote
+        """
+        expected_output = ParentNode("div", [
+            ParentNode("h1", [LeafNode(value="Heading 1")]),
+            ParentNode("p", [LeafNode(value="This is a paragraph with some **bold** and *italic* text.")]),
+            ParentNode("ul", [
+                ParentNode("li", [LeafNode(value="List item 1")]),
+                ParentNode("li", [LeafNode(value="List item 2")])
+            ]),
+            ParentNode("ol", [
+                ParentNode("li", [LeafNode(value="Ordered item 1")]),
+                ParentNode("li", [LeafNode(value="Ordered item 2")])
+            ]),
+            ParentNode("pre", [
+                ParentNode("code", [LeafNode(value="print('Hello, world!')")])
+            ]),
+            ParentNode("blockquote", [LeafNode(value="This is a quote")])
+        ])
+        self.assertEqual(markdown_to_html_node(markdown.strip()), expected_output)
+
+    def test_empty_markdown(self):
+        markdown = ""
+        expected_output = ParentNode("div", [])
+        self.assertEqual(markdown_to_html_node(markdown), expected_output)
 
 class TestMarkdownToBlocks(unittest.TestCase):
     
