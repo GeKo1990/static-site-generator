@@ -1,4 +1,4 @@
-# Static Site Generator - (WORK IN PROGRESS)
+# Static Site Generator
 
 This project is a simple static site generator that converts Markdown text into valid HTML. It supports basic Markdown syntax, including bold, italic, code, images, and links. However, it currently does not support nested Markdown.
 
