@@ -50,7 +50,7 @@ def block_to_html_node(block):
     raise ValueError("Invalid block type")
 
 def block_to_block_type(block):
-    if re.match(r"^[1-6]# ", block):
+    if re.match(r"^#{1,6} ", block):
         return block_type_heading
     elif re.match(r"^```.*```$", block, re.DOTALL):
         return block_type_code
