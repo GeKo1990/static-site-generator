@@ -7,7 +7,7 @@ from blocks import (
 
 def main():
     copy_directory_contents("./static", "./public")
-    generate_page("./content/index.md", "./template.html", "./public/index.html")
+    generate_pages_recursive("./content", "./template.html", "./public")
 
 def clear_directory(directory):
     if os.path.exists(directory):
@@ -60,5 +60,22 @@ def generate_page(from_path, template_path, dest_path):
     template = template.replace("{{ Title }}", title)
     template = template.replace("{{ Content }}", html)
     write_file(dest_path, template)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for root, dirs, files in os.walk(dir_path_content):
+        for file in files:
+            if file.endswith('.md'):
+                markdown_file_path = os.path.join(root, file)
+                html_file_path = os.path.join(dest_dir_path, os.path.relpath(markdown_file_path, dir_path_content))
+                html_file_path = os.path.splitext(html_file_path)[0] + '.html'
+                
+                generate_page(markdown_file_path, template_path, html_file_path)
+
+        for dir in dirs:
+            nested_dir_path = os.path.join(root, dir)
+            nested_dest_path = os.path.join(dest_dir_path, os.path.relpath(nested_dir_path, dir_path_content))
+            if not os.path.exists(nested_dest_path):
+                os.makedirs(nested_dest_path)
+            generate_pages_recursive(nested_dir_path, template_path, nested_dest_path)   
 
 main()
