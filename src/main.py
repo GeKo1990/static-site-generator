@@ -2,15 +2,6 @@ import os
 import shutil
 
 from blocks import (
-    markdown_to_blocks,
-    block_to_block_type,
-    paragraph_to_html_node,
-    heading_to_html_node,
-    unordered_list_to_html_node,
-    ordered_list_to_html_node,
-    code_to_html_node,
-    quote_to_html_node,
-    block_to_html_node,
     markdown_to_html_node
 )
 

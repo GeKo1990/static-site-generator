@@ -22,6 +22,13 @@ One cannot simply discuss *The Lord of the Rings* without acknowledging the bedr
 2. The tragic saga of the Noldor Elves
 3. The rise and fall of great kingdoms such as Gondolin and Númenor
 
+```
+print("Lord")
+print("of")
+print("the")
+print("Rings")
+```
+
 ## The Art of **World-Building**
 
 ### Crafting Middle-earth

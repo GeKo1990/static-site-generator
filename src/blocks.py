@@ -11,19 +11,14 @@ block_type_unordered_list = "unordered_list"
 block_type_ordered_list = "ordered_list"
 
 def markdown_to_blocks(markdown):
-    # Split the markdown text into blocks using double newlines
-    blocks = markdown.split('\n\n')
-    
-    clean_blocks = []
+    blocks = markdown.split("\n\n")
+    filtered_blocks = []
     for block in blocks:
-        # Further split blocks by single newlines if they contain list items
-        sub_blocks = block.split('\n')
-        for sub_block in sub_blocks:
-            clean_sub_block = sub_block.strip()
-            if clean_sub_block:
-                clean_blocks.append(clean_sub_block)
-    
-    return clean_blocks
+        if block == "":
+            continue
+        block = block.strip()
+        filtered_blocks.append(block)
+    return filtered_blocks
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
@@ -52,7 +47,7 @@ def block_to_html_node(block):
 def block_to_block_type(block):
     if re.match(r"^#{1,6} ", block):
         return block_type_heading
-    elif re.match(r"^```.*```$", block, re.DOTALL):
+    elif re.match(r"^```[\s\S]*```$", block, re.DOTALL):
         return block_type_code
     elif all(re.match(r"^>", line) for line in block.split('\n')):
         return block_type_quote
@@ -106,7 +101,7 @@ def code_to_html_node(block):
     if not match:
         raise ValueError('invalid code block')
     
-    text = match.group(1)
+    text = match.group(1).strip()
     children = text_to_children(text)
     code = ParentNode("code", children)
     return ParentNode("pre", [code])
